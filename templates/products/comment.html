@@ -1,0 +1,26 @@
+<li class="mb-3">
+    <strong>{{ comment.user.get_full_name }}:</strong>
+    <p>{{ comment.text }}</p>
+    <small>{{ comment.created_at }}</small>
+
+    {% if request.user.is_authenticated %}
+    <button class="btn btn-link reply-btn" data-bs-toggle="collapse" data-bs-target="#reply-form-{{ comment.id }}">Reply</button>
+
+    <div class="collapse" id="reply-form-{{ comment.id }}">
+        <form method="post" action="{% url 'add_comment' comment.product.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea class="form-control" name="comment" rows="2" required></textarea>
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <ul class="list-unstyled" style="margin-left: 20px;">
+        {% for reply in comment.replies.all %}
+            {% include 'products/comment.html' with comment=reply %}
+        {% endfor %}
+    </ul>
+</li>

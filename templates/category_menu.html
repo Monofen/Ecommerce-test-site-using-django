@@ -1,0 +1,11 @@
+<!-- category_menu.html -->
+{% for category in categoryData %}
+    <li class="dropdown-submenu">
+        <a class="dropdown-item {% if not category.get_children %}no-children{% endif %}" href="{% url 'category' category.id %}">{{ category.name }}</a>
+        {% if category.get_children %}
+            <ul class="dropdown-menu">
+                {% include 'category_menu.html' with categoryData=category.get_children %}
+            </ul>
+        {% endif %}
+    </li>
+{% endfor %}

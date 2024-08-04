@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <!-- Recommended Products Section -->
+    {% if recommended_products %}
+    <div class="row">
+        <h2>{{ recommended_type }}</h2>
+        {% for product in recommended_products %}
+        <div class="col-md-4">
+            <div class="card" style="width: 18rem;">
+                {% if product.on_sale %}
+                <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem; z-index: 1;">On Sale</div>
+                {% endif %}
+                <div id="carouselExampleControls{{ forloop.counter }}" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in product.productimage_set.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image.url }}" class="d-block w-100" alt="Image {{ forloop.counter }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls{{ forloop.counter }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls{{ forloop.counter }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description }}</p>
+                    {% if product.on_sale %}
+                    <p class="card-text"><strong>Price:</strong> <strike>${{ product.price }}</strike> ${{ product.sale_price }}</p>
+                    {% else %}
+                    <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                    {% endif %}
+                    {% if product.electronic_features %}
+                    <h6 class="card-subtitle mb-2 text-muted">Features</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Screen:</strong> {{ product.electronic_features.screen }}</li>
+                        <li class="list-group-item"><strong>RAM:</strong> {{ product.electronic_features.ram }}</li>
+                    </ul>
+                    {% endif %}
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary mt-3">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- All Products Section -->
+    <div class="row">
+        <h2>Our Products</h2>
+        {% for product in products %}
+        <div class="col-md-4">
+            <div class="card" style="width: 18rem;">
+                {% if product.on_sale %}
+                <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem; z-index: 1;">On Sale</div>
+                {% endif %}
+                <div id="carouselExampleControls{{ forloop.counter }}" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in product.productimage_set.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image.url }}" class="d-block w-100" alt="Image {{ forloop.counter }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls{{ forloop.counter }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls{{ forloop.counter }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description }}</p>
+                    {% if product.on_sale %}
+                    <p class="card-text"><strong>Price:</strong> <strike>${{ product.price }}</strike> ${{ product.sale_price }}</p>
+                    {% else %}
+                    <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                    {% endif %}
+                    {% if product.electronic_features %}
+                    <h6 class="card-subtitle mb-2 text-muted">Features</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Screen:</strong> {{ product.electronic_features.screen }}</li>
+                        <li class="list-group-item"><strong>RAM:</strong> {{ product.electronic_features.ram }}</li>
+                    </ul>
+                    {% endif %}
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary mt-3">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

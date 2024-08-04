@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container mt-5">
+        <h3 class="mb-4">Sign-up</h3>
+        <form action="/signup/" method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="Firstname" class="form-label">Firstname</label>
+                <input type="text" class="form-control" id="Firstname" name="Firstname" placeholder="Enter your Firstname" required>
+                <div class="invalid-feedback">
+                    Please enter your firstname.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Lastname" class="form-label">Lastname</label>
+                <input type="text" class="form-control" id="Lastname" name="Lastname" placeholder="Enter your Lastname" required>
+                <div class="invalid-feedback">
+                    Please enter your lastname.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="Email" name="Email" placeholder="Enter your Email" required>
+                <div class="invalid-feedback">
+                    Please enter a valid email address.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="Username" name="Username" placeholder="Create a Username" required>
+                <div class="invalid-feedback">
+                    Please create a username.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="Password" name="Password" placeholder="Create a Password" required>
+                <div class="invalid-feedback">
+                    Please create a password.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Password1" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="Password1" name="Password1" placeholder="Retype password" required>
+                <div class="invalid-feedback">
+                    Please confirm your password.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="PhoneNumber" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Enter your Phone Number" required>
+                <div class="invalid-feedback">
+                    Please enter your phone number.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Address" class="form-label">Address</label>
+                <textarea class="form-control" id="Address" name="Address" rows="3" placeholder="Enter your Address" required></textarea>
+                <div class="invalid-feedback">
+                    Please enter your address.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign-up</button>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+{% endblock %}

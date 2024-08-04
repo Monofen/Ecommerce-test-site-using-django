@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Cart Summary</h1>
+    <table class="table table-striped table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total</th>
+                <th>Pay with Khalti</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <tr>
+                    <td><a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a></td>
+                    <td>
+                        <form method="post" action="{% url 'cart:update_quantity' item.id %}">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" required>
+                            <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td>${{ item.product.price|floatformat:2 }}</td>
+                    <td>${{ item.item_total|floatformat:2 }}</td>
+                    <td>
+                        <form method="post" action="{% url 'payment:initiate_payment' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="amount" value="{{ item.item_total }}">
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <input type="hidden" name="product_name" value="{{ item.product.name }}">
+                            <input type="hidden" name="return_url" value="{% url 'payment:verify_payment' %}">
+                            <button type="submit" class="btn btn-primary">Pay for {{ item.product.name }}</button>
+                        </form>                        
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'cart:delete_item' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">Your cart is empty.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-right">Total Price:</th>
+                <th colspan="2">${{ total_cart_price|floatformat:2 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

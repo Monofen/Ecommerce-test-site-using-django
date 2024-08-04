@@ -1,0 +1,21 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Order Confirmation</h2>
+<div>
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    {% if product.on_sale %}
+        <p class="card-text"><strong>Price:</strong> <strike>${{ product.price }}</strike> ${{ product.sale_price }}</p>
+    {% else %}
+        <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+        <button type="submit">Confirm</button>
+    </form>
+</div>
+{% endblock %}

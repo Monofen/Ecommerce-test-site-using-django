@@ -133,7 +133,9 @@ def signin(request):
         if user is not None:
             login(request, user)
             if next_url:  
+                messages.success(request, 'Successfull login!!')
                 return redirect(next_url)
+            messages.success(request, 'Successfull login!!')
             return redirect('home') 
         else:
             messages.error(request, 'Invalid username or password.')

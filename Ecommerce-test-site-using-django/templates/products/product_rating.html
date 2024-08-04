@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load times %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ product.name }} - Ratings & Reviews</h1>
+            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for image in product.productimage_set.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ image.image.url }}" class="d-block w-100" alt="Image {{ forloop.counter }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="mt-5">
+                <h2>Ratings</h2>
+                <ul class="list-unstyled">
+                    {% for rating in ratings %}
+                    <li class="media mb-4">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-1">{{ rating.user.username }} <small class="text-muted">{{ rating.created_at }}</small></h5>
+                            <div class="rating">
+                                {% for i in 5|times %}
+                                    <span class="star{% if i <= rating.stars %} filled{% endif %}">&#9733;</span>
+                                {% endfor %}
+                            </div>
+                            <p>{{ rating.comment }}</p>
+                            {% if rating.image %}
+                            <img src="{{ rating.image.url }}" alt="Rating image" class="img-fluid mt-2">
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li>No ratings yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

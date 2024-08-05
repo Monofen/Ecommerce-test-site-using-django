@@ -1,4 +1,4 @@
-# context_processors.py
+
 from .models import Category
 
 def categories(request):

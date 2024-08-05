@@ -49,7 +49,6 @@ def some_view(request):
     try:
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
-        # Handle the missing profile, e.g., create one
         UserProfile.objects.create(user=request.user)
         profile = request.user.userprofile
 
@@ -86,7 +85,6 @@ def signup(request):
         myuser.is_active = False
         myuser.save()
         
-        # Create or update UserProfile
         profile, created = UserProfile.objects.get_or_create(user=myuser)
         profile.address = address
         profile.phone_number = phone_number

@@ -40,6 +40,12 @@
                             {% if rating.image %}
                             <img src="{{ rating.image.url }}" alt="Rating image" class="img-fluid mt-2">
                             {% endif %}
+                            {% if request.user == rating.user %}
+                            <div class="mt-2">
+                                <a href="{% url 'edit_rating' rating.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                                <a href="{% url 'delete_rating' rating.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                            {% endif %}
                         </div>
                     </li>
                     {% empty %}

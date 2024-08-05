@@ -63,16 +63,20 @@
             <h2>Rate this Product</h2>
             {% if request.user.is_authenticated %}
                 {% if has_purchased %}
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ rating_form.as_p }}
-                    <button type="submit" class="btn btn-primary">Submit Rating</button>
-                </form>
+                    {% if not user_has_rated %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ rating_form.as_p }}
+                            <button type="submit" class="btn btn-primary">Submit Rating</button>
+                        </form>
+                    {% else %}
+                        <p>You have already rated this product.</p>
+                    {% endif %}
                 {% else %}
-                <p>You can rate this product only if you have purchased it.</p>
+                    <p>You can rate this product only if you have purchased it.</p>
                 {% endif %}
             {% else %}
-            <p>You need to <a href="{% url 'signin' %}?next={{ request.path }}">log in</a> to rate this product.</p>
+                <p>You need to <a href="{% url 'signin' %}?next={{ request.path }}">log in</a> to rate this product.</p>
             {% endif %}
         </div>
     </div>
@@ -102,8 +106,8 @@
         </div>
     </div>
 
-    <!-- Comments Section -->
-    <div class="row mt-5">
+     <!-- Comments Section -->
+     <div class="row mt-5">
         <div class="col-md-12">
             <h2>Comments</h2>
             <ul class="list-unstyled">
@@ -127,32 +131,6 @@
             {% endif %}
         </div>
     </div>
-
-    <!-- Ratings Section -->
-    <div class="row mt-5">
-        <div class="col-md-12">
-            <h2>Ratings</h2>
-            <ul class="list-unstyled">
-                {% for rating in ratings %}
-                <li class="media mb-4">
-                    <div class="media-body">
-                        <h5 class="mt-0 mb-1">{{ rating.user.username }} <small class="text-muted">{{ rating.created_at }}</small></h5>
-                        <div class="rating">
-                            {% for i in star_range %}
-                                <span class="star{% if i <= rating.stars %} filled{% endif %}">&#9733;</span>
-                            {% endfor %}
-                        </div>
-                        <p>{{ rating.comment }}</p>
-                        {% if rating.image %}
-                        <img src="{{ rating.image.url }}" alt="Rating image" class="img-fluid mt-2">
-                        {% endif %}
-                    </div>
-                </li>
-                {% empty %}
-                <li>No ratings yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
 </div>
+
 {% endblock %}

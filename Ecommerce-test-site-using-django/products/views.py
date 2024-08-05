@@ -4,9 +4,10 @@ from .models import Product, Category, Comment, Rating
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from cart.models import Purchase
-from .forms import RatingForm
+from .forms import RatingForm, CommentForm
 from random import sample
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 def index(request):
     products = Product.objects.all()
@@ -54,12 +55,14 @@ def product_detail(request, product_id):
     ratings = product.ratings.all()
 
     has_purchased = False
+    user_has_rated = False
     if request.user.is_authenticated:
         has_purchased = Purchase.objects.filter(user=request.user, product=product).exists()
+        user_has_rated = Rating.objects.filter(user=request.user, product=product).exists()
 
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
 
-    if request.method == 'POST':
+    if request.method == 'POST' and not user_has_rated:
         rating_form = RatingForm(request.POST, request.FILES)
         if rating_form.is_valid():
             rating = rating_form.save(commit=False)
@@ -75,12 +78,35 @@ def product_detail(request, product_id):
         'comments': comments,
         'ratings': ratings,
         'has_purchased': has_purchased,
+        'user_has_rated': user_has_rated,
         'rating_form': rating_form,
         'related_products': related_products,
-        'star_range': range(1, 6),  
+        'star_range': range(1, 6),
     }
     return render(request, 'products/products_detail.html', context)
 
+@login_required
+def edit_rating(request, rating_id):
+    rating = get_object_or_404(Rating, pk=rating_id)
+    if request.user != rating.user:
+        return redirect('product_ratings', product_id=rating.product.id)
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST, request.FILES, instance=rating)
+        if form.is_valid():
+            form.save()
+            return redirect('product_ratings', product_id=rating.product.id)
+    else:
+        form = RatingForm(instance=rating)
+
+    return render(request, 'products/edit_rating.html', {'form': form, 'rating': rating})
+
+@login_required
+def delete_rating(request, rating_id):
+    rating = get_object_or_404(Rating, pk=rating_id)
+    if request.user == rating.user:
+        rating.delete()
+    return redirect('product_ratings', product_id=rating.product.id)
 
 @login_required
 def add_comment(request, product_id):
@@ -100,6 +126,26 @@ def add_comment(request, product_id):
             parent=parent_comment
         )
         return redirect('product_detail', product_id=product_id)
+    
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.user != comment.user:
+        return redirect('product_detail', product_id=comment.product.id)
+    
+    if request.method == 'POST':
+        comment.text = request.POST.get('comment')
+        comment.save()
+        return redirect('product_detail', product_id=comment.product.id)
+
+    return redirect('product_detail', product_id=comment.product.id)
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.user == comment.user:
+        comment.delete()
+    return redirect('product_detail', product_id=comment.product.id)
     
 def product_ratings(request, product_id):
     product = get_object_or_404(Product, pk=product_id)

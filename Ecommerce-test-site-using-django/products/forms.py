@@ -1,5 +1,5 @@
 from django import forms
-from .models import Rating
+from .models import Rating, Comment
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -14,4 +14,12 @@ class RatingForm(forms.ModelForm):
                 (5, '5 Stars')
             ]),
             'comment': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3}),
         }

@@ -4,18 +4,36 @@
     <small>{{ comment.created_at }}</small>
 
     {% if request.user.is_authenticated %}
-    <button class="btn btn-link reply-btn" data-bs-toggle="collapse" data-bs-target="#reply-form-{{ comment.id }}">Reply</button>
+        <button class="btn btn-link reply-btn" data-bs-toggle="collapse" data-bs-target="#reply-form-{{ comment.id }}">Reply</button>
 
-    <div class="collapse" id="reply-form-{{ comment.id }}">
-        <form method="post" action="{% url 'add_comment' comment.product.id %}">
-            {% csrf_token %}
-            <div class="mb-3">
-                <textarea class="form-control" name="comment" rows="2" required></textarea>
-                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+        {% if request.user == comment.user %}
+            <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#edit-form-{{ comment.id }}">Edit</button>
+            <form method="post" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-danger">Delete</button>
+            </form>
+
+            <div class="collapse" id="edit-form-{{ comment.id }}">
+                <form method="post" action="{% url 'edit_comment' comment.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea class="form-control" name="comment" rows="2" required>{{ comment.text }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
-        </form>
-    </div>
+        {% endif %}
+
+        <div class="collapse" id="reply-form-{{ comment.id }}">
+            <form method="post" action="{% url 'add_comment' comment.product.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea class="form-control" name="comment" rows="2" required></textarea>
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+            </form>
+        </div>
     {% endif %}
 
     <ul class="list-unstyled" style="margin-left: 20px;">

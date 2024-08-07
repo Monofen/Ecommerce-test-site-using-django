@@ -210,7 +210,19 @@
             });
         });
         </script>
-        
+        <script>
+            function showElectronicsFeatures(select) {
+                var electronicsFeatures = document.getElementById('electronics_features');
+                var categoryId = select.value;
+                
+                // Assuming category ID for electronics is '1', you can adjust this based on your setup
+                if (categoryId === '1') {
+                    electronicsFeatures.style.display = 'block';
+                } else {
+                    electronicsFeatures.style.display = 'none';
+                }
+            }
+            </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

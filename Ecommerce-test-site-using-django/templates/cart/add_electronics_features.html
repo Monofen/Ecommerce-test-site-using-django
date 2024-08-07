@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="POST" action="{% url 'cart:add_electronics_features' product_id=product_id %}">
+    {% csrf_token %}
+    <label for="screen">Screen Type:</label>
+    <select id="screen" name="screen">
+        <option value="LCD">LCD</option>
+        <option value="LED">LED</option>
+        <option value="OLED">OLED</option>
+        <option value="AMOLED">AMOLED</option>
+    </select>
+
+    <label for="ram">RAM:</label>
+    <select id="ram" name="ram">
+        <option value="2GB">2GB</option>
+        <option value="4GB">4GB</option>
+        <option value="8GB">8GB</option>
+        <option value="16GB">16GB</option>
+    </select>
+
+    <button type="submit">Save Electronics Features</button>
+</form>
+{% endblock %}

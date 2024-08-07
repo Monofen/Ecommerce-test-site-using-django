@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-3">
+        <div class="col-sm-10">
+            <h1>{{ request.user.username }}</h1>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-sm-3">
+            <div class="card text-center mb-3">
+                <div class="card-body">
+                    <img src="{{ profile.photo.url }}" class="rounded-circle img-thumbnail mb-3" alt="avatar">
+                    <h6>Upload a different photo...</h6>
+                    <input type="file" class="form-control mt-2">
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">Contact Info</div>
+                <div class="card-body">
+                    <p><strong>Address:</strong> {{ profile.address }}</p>
+                    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">Social Media</div>
+                <div class="card-body">
+                    <a href="#"><i class="fa fa-facebook fa-2x me-2"></i></a>
+                    <a href="#"><i class="fa fa-github fa-2x me-2"></i></a>
+                    <a href="#"><i class="fa fa-twitter fa-2x me-2"></i></a>
+                    <a href="#"><i class="fa fa-pinterest fa-2x me-2"></i></a>
+                    <a href="#"><i class="fa fa-google-plus fa-2x"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="false">Create Shop</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Sales</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="add-product-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="add-product" aria-selected="false">Add Product</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">User Information</h4>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p><strong>First name:</strong> {{ request.user.first_name }}</p>
+                                </div>
+                                <div class="col">
+                                    <p><strong>Last name:</strong> {{ request.user.last_name }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                                </div>
+                                <div class="col">
+                                    <p><strong>Email:</strong> {{ request.user.email }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p><strong>Location:</strong> {{ profile.address }}</p>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <a href="#" class="btn btn-warning">Change Password</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            Your Products
+                        </div>
+                        <div class="card-body">
+                            {% if products %}
+                                <div class="row">
+                                    {% for product in products %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                {% if product.productimage_set.first %}
+                                                    <img src="{{ product.productimage_set.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                                {% endif %}
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ product.name }}</h5>
+                                                    <p class="card-text">{{ product.description }}</p>
+                                                    <p class="card-text">${{ product.price }}</p>
+                                                    <a href="#" class="btn btn-primary">Edit Product</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p>No products added yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">Create Shop</h4>
+                            {% if not seller %}
+                            <form method="post" action="{% url 'profile' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="shop_name" class="form-label">Shop Name</label>
+                                    <input type="text" class="form-control" id="shop_name" name="shop_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="khalti_api_code" class="form-label">Khalti API Code</label>
+                                    <input type="text" class="form-control" id="khalti_api_code" name="khalti_api_code" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create Shop</button>
+                            </form>
+                            {% else %}
+                            <p>You already have a shop: {{ seller.name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>                
+                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">Sales</h4>
+                            {% if seller %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Number of Sales</th>
+                                        <th>Buyer Information</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in seller.products_list.all %}
+                                    <tr>
+                                        <td>{{ product.name }}</td>
+                                        <td>
+                                            {% with product.purchase_set.count as sale_count %}
+                                                {{ sale_count }}
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            {% for purchase in product.purchase_set.all %}
+                                                <div>Email: {{ purchase.user.email }}, Phone: {{ purchase.phone }}</div>
+                                            {% empty %}
+                                                No buyers yet
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p>No sales data available. Please create a shop first.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="add-product" role="tabpanel" aria-labelledby="add-product-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">Add Product</h4>
+                            <form method="post" action="{% url 'cart:add_product' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="product_name" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="product_name" name="product_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product_price" class="form-label">Product Price</label>
+                                    <input type="number" class="form-control" id="product_price" name="product_price" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="product_image" class="form-label">Product Image</label>
+                                    <input type="file" class="form-control" id="product_image" name="product_image" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-control" id="category" name="category">
+                                        <option value="">Select Category</option>
+                                        {% include 'category_dropdown.html' with categoryData=categories prefix="" %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="on_sale" class="form-label">On Sale</label>
+                                    <input type="checkbox" id="on_sale" name="on_sale">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sale_price" class="form-label">Sale Price</label>
+                                    <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Product</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+
+{% for category in categoryData %}
+    <option value="{{ category.id }}">{{ prefix }}{{ category.name }}</option>
+    {% if category.get_children %}
+        {% include 'category_dropdown.html' with categoryData=category.get_children prefix=prefix|add:"-- " %}
+    {% endif %}
+{% endfor %}

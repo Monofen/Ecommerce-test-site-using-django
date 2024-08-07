@@ -1,6 +1,7 @@
 from django.db import models
 import datetime
 from django.contrib.auth.models import User
+from sellers.models import Sellers
 
 class Category(models.Model):
     search_field = ('name',)
@@ -18,7 +19,6 @@ class Category(models.Model):
         return Category.objects.filter(parent=self)
 
     def get_all_subcategories(self):
-        """Recursively get all subcategories"""
         subcategories = list(self.get_children())
         for subcategory in subcategories:
             subcategories.extend(subcategory.get_all_subcategories())
@@ -26,6 +26,7 @@ class Category(models.Model):
     
 class Product(models.Model):
     search_field = ('name',)
+    sellers = models.ManyToManyField(Sellers, related_name='products_list')
     name = models.CharField(max_length=100)
     price = models.DecimalField(default=0,decimal_places=2, max_digits=6)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)

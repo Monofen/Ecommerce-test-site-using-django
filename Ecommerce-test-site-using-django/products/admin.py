@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating
+from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers
+
+
 
 @admin.register(Category)
 class CategoriesAdmin(admin.ModelAdmin):

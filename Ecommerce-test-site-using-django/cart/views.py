@@ -5,6 +5,22 @@ from sellers.models import Sellers
 from cart.models import CartItem, Purchase
 from django.contrib import messages
 from authentication.models import UserProfile
+from .forms import ProductForm
+
+@login_required
+def update_photo(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+
+    if request.method == 'POST':
+        if 'photo' in request.FILES:
+            profile.photo = request.FILES['photo']
+            profile.save()
+            messages.success(request, 'Profile photo updated successfully!')
+        else:
+            messages.error(request, 'No photo uploaded.')
+        return redirect('profile')
+
+    return redirect('profile')
 
 @login_required
 def order_confirmation(request, product_id):
@@ -102,7 +118,8 @@ def add_product(request):
         category_id = request.POST.get('category')
         description = request.POST.get('description')
         on_sale = 'on_sale' in request.POST
-        sale_price = request.POST.get('sale_price', 0)
+        sale_price = request.POST.get('sale_price') if on_sale else None
+        
         try:
             seller = Sellers.objects.get(user=request.user)
         except Sellers.DoesNotExist:
@@ -116,14 +133,13 @@ def add_product(request):
             category=category,
             description=description,
             on_sale=on_sale,
-            sale_price=sale_price,
+            sale_price=sale_price,  # Set sale_price only if on_sale is True
         )
 
         product.sellers.set([seller])
 
-        if 'product_image' in request.FILES:
-            images = request.FILES.getlist('product_image')
-            for image in images:
+        if 'product_images' in request.FILES:
+            for image in request.FILES.getlist('product_images'):
                 ProductImage.objects.create(product=product, image=image)
 
         if category.is_electronics:
@@ -145,3 +161,29 @@ def add_electronics_features(request, product_id):
         return redirect('profile')
 
     return render(request, 'cart/add_electronics_features.html', {'product_id': product_id})
+
+@login_required
+def edit_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product, product=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Product detail changed!!")
+            return redirect('profile')
+    else:
+        form = ProductForm(instance=product, product=product)
+
+    return render(request, 'edit_product.html', {'form': form, 'product': product})
+
+
+@login_required
+def delete_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        product.delete()
+        messages.success(request, "Product removed!!")
+        return redirect('profile')  
+
+    return render(request, 'delete_product.html', {'product': product})

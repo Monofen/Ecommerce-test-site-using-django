@@ -1,11 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from products.models import Product, Category, ProductImage, ElectronicProduct
 from sellers.models import Sellers
 from cart.models import CartItem, Purchase
 from django.contrib import messages
 from authentication.models import UserProfile
 from .forms import ProductForm
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.utils.translation import gettext as _
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import SetPasswordForm
 
 @login_required
 def update_photo(request):
@@ -187,3 +201,141 @@ def delete_product(request, pk):
         return redirect('profile')  
 
     return render(request, 'delete_product.html', {'product': product})
+
+@login_required
+def edit_shop(request):
+    seller = get_object_or_404(Sellers, user=request.user)
+    
+    if request.method == 'POST':
+        new_name = request.POST.get('shop_name')
+        seller.name = new_name
+        seller.save()
+        messages.success(request, 'Shop name updated successfully!')
+        return redirect('profile')
+    
+    return render(request, 'cart/edit_shop.html', {'seller': seller})
+
+@login_required
+def delete_shop(request):
+    seller = get_object_or_404(Sellers, user=request.user)
+    
+    if request.method == 'POST':
+        generate_token = PasswordResetTokenGenerator()
+        verification_code = generate_token.make_token(request.user)
+        
+        delete_confirmation_url = request.build_absolute_uri(
+            reverse("cart:confirm_delete_shop", args=[verification_code, seller.pk])    
+        )
+        
+        send_mail(
+            'Delete Shop Verification',
+            f'Click the link to confirm deletion: {delete_confirmation_url}',
+            'no-reply@example.com',
+            [request.user.email],
+            fail_silently=False,
+        )
+        
+        messages.info(request, 'A verification email has been sent to you.')
+        return redirect('profile')
+    
+    return redirect('profile')
+
+@login_required
+def confirm_delete_shop(request, verification_code, seller_pk):
+    # Validate the verification code/token and seller_pk
+    seller = get_object_or_404(Sellers, pk=seller_pk, user=request.user)
+
+    # Check if the verification code is valid
+    if not PasswordResetTokenGenerator().check_token(request.user, verification_code):
+        messages.error(request, 'Invalid or expired verification link.')
+        return redirect('profile')
+
+    # Retrieve all products related to the seller
+    products = seller.products_list.all()
+
+    # Delete related data for each product
+    for product in products:
+        # Delete related electronic features
+        if hasattr(product, 'electronic_features'):
+            product.electronic_features.delete()
+        
+        # Delete related images
+        product.productimage_set.all().delete()
+        
+        # Delete related comments
+        product.comments.all().delete()
+        
+        # Delete the product itself
+        product.delete()
+
+    # Delete the seller
+    seller.delete()
+
+    messages.success(request, 'Your shop and all related products have been deleted.')
+    return redirect('profile')
+
+@login_required
+def send_change_password_email(request):
+    user = request.user
+    token_generator = PasswordResetTokenGenerator()
+    token = token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    
+    current_site = get_current_site(request)
+    mail_subject = _('Change your password')
+    message = render_to_string('cart/change_password_email.html', {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': uid,
+        'token': token,
+        'protocol': 'https' if request.is_secure() else 'http',
+    })
+    send_mail(
+        mail_subject, 
+        message, 
+        settings.DEFAULT_FROM_EMAIL, 
+        [user.email]
+    )
+    messages.success(request, _('A confirmation email has been sent to your email address.'))
+    return redirect('profile')
+
+def change_password_confirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    token_generator = PasswordResetTokenGenerator()
+    
+    if user is not None and token_generator.check_token(user, token):
+        # Redirect to password_change_form view
+        return redirect('cart:password_change_form', uidb64=uidb64, token=token)
+    else:
+        messages.error(request, _('The password reset link is invalid, possibly because it has already been used.'))
+        return redirect('profile')
+
+def password_change_form(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    token_generator = PasswordResetTokenGenerator()
+    
+    if user is not None and token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                update_session_auth_hash(request, form.user)  # Keep the user logged in
+                messages.success(request, 'Your password has been set successfully!')
+                return redirect('profile')
+        else:
+            form = SetPasswordForm(user)
+        return render(request, 'cart/password_change_form.html', {'form': form})
+    else:
+        messages.error(request, 'The password reset link is invalid or has expired.')
+        return redirect('profile')
+

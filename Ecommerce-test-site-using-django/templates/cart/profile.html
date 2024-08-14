@@ -26,7 +26,7 @@
                     <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
                 </div>
             </div>
-            <div class="card mb-3">
+            <!-- <div class="card mb-3">
                 <div class="card-header">Social Media</div>
                 <div class="card-body">
                     <a href="#"><i class="fa fa-facebook fa-2x me-2"></i></a>
@@ -35,7 +35,7 @@
                     <a href="#"><i class="fa fa-pinterest fa-2x me-2"></i></a>
                     <a href="#"><i class="fa fa-google-plus fa-2x"></i></a>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="col-sm-9">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -81,8 +81,8 @@
                                 </div>
                             </div>
                             <div class="text-end">
-                                <a href="#" class="btn btn-warning">Change Password</a>
-                            </div>
+                                <a href="{% url 'cart:send_change_password_email' %}" class="btn btn-warning">Change Password</a>
+                            </div>                            
                         </div>
                     </div>
                     {% if seller %}
@@ -123,7 +123,7 @@
                 <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
                     <div class="card mt-3">
                         <div class="card-body">
-                            <h4 class="card-title">Create Shop</h4>
+                            <h4 class="card-title">Shop Management</h4>
                             {% if not seller %}
                             <form method="post" action="{% url 'profile' %}">
                                 {% csrf_token %}
@@ -139,10 +139,15 @@
                             </form>
                             {% else %}
                             <p>You already have a shop: {{ seller.name }}</p>
+                            <a href="{% url 'cart:edit_shop' %}" class="btn btn-warning">Edit Shop</a>
+                            <form method="post" action="{% url 'cart:delete_shop' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your shop? A verification email will be sent to you.')">Delete Shop</button>
+                            </form>
                             {% endif %}
                         </div>
                     </div>
-                </div>                
+                </div>           
                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                     <div class="card mt-3">
                         <div class="card-body">

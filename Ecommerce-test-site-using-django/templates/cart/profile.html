@@ -101,7 +101,6 @@
                                                 {% endif %}
                                                 <div class="card-body">
                                                     <h5 class="card-title">{{ product.name }}</h5>
-                                                    <p class="card-text">{{ product.description }}</p>
                                                     {% if product.on_sale %}
                                                         <p class="card-text"><strong>Price:</strong> <strike>${{ product.price }}</strike> ${{ product.sale_price }}</p>
                                                     {% else %}
@@ -125,18 +124,8 @@
                         <div class="card-body">
                             <h4 class="card-title">Shop Management</h4>
                             {% if not seller %}
-                            <form method="post" action="{% url 'profile' %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label for="shop_name" class="form-label">Shop Name</label>
-                                    <input type="text" class="form-control" id="shop_name" name="shop_name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="khalti_api_code" class="form-label">Khalti API Code</label>
-                                    <input type="text" class="form-control" id="khalti_api_code" name="khalti_api_code" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Create Shop</button>
-                            </form>
+                                <p>You don't have a shop yet. Start by creating one!</p>
+                                <a href="{% url 'create_shop' %}" class="btn btn-primary">Create Shop</a>
                             {% else %}
                             <p>You already have a shop: {{ seller.name }}</p>
                             <a href="{% url 'cart:edit_shop' %}" class="btn btn-warning">Edit Shop</a>
@@ -187,7 +176,9 @@
                         </div>
                     </div>
                 </div>
-                {% if seller %}
+                {% if not seller.is_verified %}
+                    <p>Your shop is not verified yet. You cannot add products until your shop is verified.</p>
+                {% else %}
                 <div class="tab-pane fade" id="add-product" role="tabpanel" aria-labelledby="add-product-tab">
                     <div class="card mt-3">
                         <div class="card-body">

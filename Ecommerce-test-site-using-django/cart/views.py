@@ -102,25 +102,13 @@ def profile(request):
     seller = Sellers.objects.filter(user=request.user).first()
     products = Product.objects.filter(sellers__user=request.user)
 
-    if request.method == 'POST':
-        if not seller:
-            shop_name = request.POST.get('shop_name')
-            khalti_api_code = request.POST.get('khalti_api_code')
-            Sellers.objects.create(
-                name=shop_name,
-                user=request.user,
-                khalti_api_code=khalti_api_code
-            )
-            messages.success(request, 'Shop created successfully!')
-            return redirect('profile')
-
     categories = Category.objects.all()
 
     context = {
         'profile': profile,
         'seller': seller,
         'categories': categories,
-        'products': products,  # Include the products in the context
+        'products': products,  
     }
     return render(request, 'cart/profile.html', context)
 

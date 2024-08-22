@@ -17,7 +17,6 @@
         {% for user in users %}
         <div class="col-md-4 mb-4">
             <div class="card">
-                <!-- Use the user's profile photo or a default image if not available -->
                 <img src="{{ user.userprofile.photo.url|default:'/media/uploads/user_profile/default.jpg' }}" class="card-img-top" alt="{{ user.username }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ user.username }}</h5>
@@ -33,17 +32,46 @@
                         <p><strong>Shop Name:</strong> {{ seller.name }}</p>
                         <p><strong>Khalti API Code:</strong> {{ seller.khalti_api_code }}</p>
                         <p><strong>Verified:</strong> {{ seller.is_verified|yesno:"Yes,No" }}</p>
-                        <!-- Add more seller details here if needed -->
                         {% endfor %}
                     </div>
                     {% endif %}
                     
                 </div>
                 <div class="card-footer">
-                    <form action="{% url 'delete_user' user.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    <!-- Trigger Modal -->
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ user.id }}">
+                        Delete
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal-{{ user.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'delete_user' user.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <label for="reason">Select Reason for Deletion:</label>
+                                        <select name="reason" id="reason" class="form-select" required>
+                                            <option value="Violation of terms">Violation of terms</option>
+                                            <option value="Inactivity">Inactivity</option>
+                                            <option value="User request">User request</option>
+                                            <option value="custom">Custom Reason</option>
+                                        </select>
+                                        <textarea name="custom_reason" class="form-control mt-3" placeholder="If custom, please specify here..." style="display: none;"></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -52,4 +80,21 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('select[name="reason"]').forEach(function(selectElement) {
+            selectElement.addEventListener('change', function() {
+                let textarea = this.parentElement.querySelector('textarea[name="custom_reason"]');
+                if (this.value === 'custom') {
+                    textarea.style.display = 'block';
+                    textarea.required = true;
+                } else {
+                    textarea.style.display = 'none';
+                    textarea.required = false;
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

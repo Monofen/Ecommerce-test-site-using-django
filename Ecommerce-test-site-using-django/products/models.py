@@ -23,6 +23,17 @@ class Category(models.Model):
         for subcategory in subcategories:
             subcategories.extend(subcategory.get_all_subcategories())
         return subcategories
+
+class CategorySale(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='sales')
+    percentage = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.category.name} - {self.percentage}% Sale"
+
+    class Meta:
+        verbose_name = 'Category Sale'
+        verbose_name_plural = 'Category Sales'
     
 class Product(models.Model):
     search_field = ('name',)

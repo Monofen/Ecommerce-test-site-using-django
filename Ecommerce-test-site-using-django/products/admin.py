@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers
+from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers, CategorySale
 
 
 
@@ -19,6 +19,7 @@ class ElectronicProductInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Electronic Features'
     fk_name = 'product'
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -48,3 +49,10 @@ class RatingAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'stars', 'created_at')
 
 admin.site.register(Rating, RatingAdmin)
+
+class CategorySaleAdmin(admin.ModelAdmin):
+    list_display = ('category', 'percentage') 
+    search_fields = ('category__name',)  
+    list_filter = ('category',)  
+
+admin.site.register(CategorySale, CategorySaleAdmin)

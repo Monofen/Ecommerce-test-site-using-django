@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Manage Categories</h1>
+
+    <!-- Parent Category Cards -->
+    <div class="row">
+        {% for parent_category in parent_categories %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ parent_category.name }}</h5>
+                </div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#saleModal-{{ parent_category.id }}">
+                    Set Sale
+                </button>
+                <button type="button" class="btn btn-primary mt-2" data-bs-toggle="collapse" data-bs-target="#subcategory-{{ parent_category.id }}">
+                    Within this Category
+                </button>
+                
+                <!-- Subcategory Collapse -->
+                <div id="subcategory-{{ parent_category.id }}" class="collapse mt-3">
+                    {% for subcategory in parent_category.get_children %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ subcategory.name }}</h6>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#saleModal-{{ subcategory.id }}">
+                                Set Sale
+                            </button>
+                            <button type="button" class="btn btn-primary mt-2" data-bs-toggle="collapse" data-bs-target="#subsubcategory-{{ subcategory.id }}">
+                                Within this Category
+                            </button>
+
+                            <!-- Sub-subcategory Collapse -->
+                            <div id="subsubcategory-{{ subcategory.id }}" class="collapse mt-3">
+                                {% for subsubcategory in subcategory.get_children %}
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ subsubcategory.name }}</h6>
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#saleModal-{{ subsubcategory.id }}">
+                                            Set Sale
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Modal for Sub-subcategory (3rd level) -->
+                                <div class="modal fade" id="saleModal-{{ subsubcategory.id }}" tabindex="-1" aria-labelledby="saleModalLabel-{{ subsubcategory.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="saleModalLabel-{{ subsubcategory.id }}">Set Sale Percentage</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form id="sale-form-{{ subsubcategory.id }}" method="post">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <label for="sale_percentage_{{ subsubcategory.id }}">Enter Sale Percentage:</label>
+                                                    <input type="number" name="sale_percentage" id="sale_percentage_{{ subsubcategory.id }}" class="form-control" min="0" max="100" step="0.01" value="{{ subsubcategory.categorysale.percentage|default_if_none:'' }}" required>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-success" onclick="submitForm('{{ subsubcategory.id }}')">Set Sale</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Subcategory (2nd level) -->
+                    <div class="modal fade" id="saleModal-{{ subcategory.id }}" tabindex="-1" aria-labelledby="saleModalLabel-{{ subcategory.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="saleModalLabel-{{ subcategory.id }}">Set Sale Percentage</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="sale-form-{{ subcategory.id }}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <label for="sale_percentage_{{ subcategory.id }}">Enter Sale Percentage:</label>
+                                        <input type="number" name="sale_percentage" id="sale_percentage_{{ subcategory.id }}" class="form-control" min="0" max="100" step="0.01" value="{{ subcategory.categorysale.percentage|default_if_none:'' }}" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-success" onclick="submitForm('{{ subcategory.id }}')">Set Sale</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+                
+                <!-- Modal for Parent Category (1st level) -->
+                <div class="modal fade" id="saleModal-{{ parent_category.id }}" tabindex="-1" aria-labelledby="saleModalLabel-{{ parent_category.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="saleModalLabel-{{ parent_category.id }}">Set Sale Percentage</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="sale-form-{{ parent_category.id }}" method="post">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <label for="sale_percentage_{{ parent_category.id }}">Enter Sale Percentage:</label>
+                                    <input type="number" name="sale_percentage" id="sale_percentage_{{ parent_category.id }}" class="form-control" min="0" max="100" step="0.01" value="{{ parent_category.categorysale.percentage|default_if_none:'' }}" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-success" onclick="submitForm('{{ parent_category.id }}')">Set Sale</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function submitForm(categoryId) {
+    const percentage = document.getElementById('sale_percentage_' + categoryId).value;
+    const form = document.getElementById('sale-form-' + categoryId);
+    form.action = `/set-sale/${categoryId}/${percentage}/`;
+}
+</script>
+{% endblock %}

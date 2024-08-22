@@ -5,10 +5,7 @@
 {% block content %}
 <h1>Admin Menu</h1>
 <ul>
-    <li><a href="#">Dashboard</a></li>
     <li><a href="{% url 'manage_users' %}">Manage Users</a></li>
-    <li><a href="#">Manage Products</a></li>
-    <li><a href="#">Manage Orders</a></li>
-    <li><a href="#">Manage Categories</a></li>
+    <li><a href="{% url 'manage_sales' %}">Add Site wide Sale</a></li>
 </ul>
 {% endblock %}

@@ -30,7 +30,7 @@ def initiate_payment(request):
 
         payload = json.dumps({
             "return_url": return_url,
-            "website_url": "http://127.0.0.1:8000/",
+            "website_url": "https://127.0.0.1:8000/",
             "amount": amount,
             "purchase_order_id": purchase_order_id,  
             "purchase_order_name": product_name,
@@ -40,7 +40,7 @@ def initiate_payment(request):
                 "phone": phone_number
             }
         })
-
+        print(payload)
         headers = {
             'Authorization': f'Key {settings.KHALTI_API_KEY}',
             'Content-Type': 'application/json',

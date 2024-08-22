@@ -6,6 +6,9 @@ from django.db.models import Q
 import hashlib
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
+from products.models import Category, CategorySale, Product
+from django.contrib import messages
+from decimal import Decimal
 
 def admin_menu(request):
     return render(request, 'mod/admin_menu.html')
@@ -44,3 +47,61 @@ def delete_user(request, user_id):
         return redirect('manage_users')
 
     return redirect('manage_users')
+
+def manage_sales(request): 
+    parent_categories = Category.objects.filter(parent__isnull=True)
+    return render(request, 'mod/manage_sales.html', {'parent_categories': parent_categories})
+
+
+
+def set_sale(request, category_id, percentage):
+    category = get_object_or_404(Category, id=category_id)
+
+    # Validate percentage
+    if not (0 <= percentage <= 100):
+        messages.error(request, 'Percentage must be between 0 and 100.')
+        return redirect('manage_users')
+
+    # Convert percentage to Decimal
+    percentage_decimal = Decimal(percentage)
+
+    # Update or create the CategorySale entry
+    category_sale, created = CategorySale.objects.update_or_create(
+        category=category,
+        defaults={'percentage': percentage_decimal}
+    )
+
+    # List of categories to update including subcategories
+    categories_to_update = [category] + list(category.get_all_subcategories())
+    
+    for cat in categories_to_update:
+        # Update or create the CategorySale entry for each category
+        CategorySale.objects.update_or_create(
+            category=cat,
+            defaults={'percentage': percentage_decimal}
+        )
+
+        # Update sale price for all products in this category
+        products = Product.objects.filter(category=cat)
+        for product in products:
+            original_price = product.price
+            if percentage > 0:
+                percentage_decimal = Decimal(percentage) / Decimal(100)
+                new_sale_price = original_price - (percentage_decimal * original_price)
+                product.sale_price = new_sale_price
+                product.on_sale = True
+            else:
+                product.sale_price = original_price
+                product.on_sale = False
+            product.save()
+
+    if created:
+        messages.success(request, f'Sale of {percentage}% has been set for {category.name}.')
+    else:
+        messages.success(request, f'Sale percentage updated to {percentage}% for {category.name}.')
+
+    return redirect('manage_sales')
+
+
+
+

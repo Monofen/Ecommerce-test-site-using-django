@@ -18,12 +18,36 @@ from random import sample
 from django.contrib.auth.models import User
 from cart.models import Purchase
 import random
+from django.utils import timezone
+from products.models import Product, Sale, Category
 
 def home(request):
     products = Product.objects.all()
     recommended_products = []
     recommended_type = None
 
+    # Fetch active sales
+    current_time = timezone.now()
+    site_wide_sales = Sale.objects.filter(start_date__lte=current_time, end_date__gte=current_time, sale_type='site-wide')
+    category_sales = Sale.objects.filter(start_date__lte=current_time, end_date__gte=current_time, sale_type='category')
+
+    site_wide_sale = site_wide_sales.first() if site_wide_sales.exists() else None
+
+    # Apply sales to products
+    for product in products:
+        if site_wide_sale:
+            product.sale_price = product.price * (1 - site_wide_sale.percentage / 100)
+            product.on_sale = True
+        else:
+            category_sale = category_sales.filter(category=product.category).first()
+            if category_sale:
+                product.sale_price = product.price * (1 - category_sale.percentage / 100)
+                product.on_sale = True
+            else:
+                product.sale_price = product.price
+                product.on_sale = False
+
+    # Fetch recommended products
     if request.user.is_authenticated:
         last_purchase = Purchase.objects.filter(user=request.user).order_by('-purchase_date').first()
         if last_purchase:
@@ -42,7 +66,11 @@ def home(request):
             recommended_products = list(best_sellers)[:3]
             recommended_type = "Best Sellers"
 
-    return render(request, 'index.html', {'products': products, 'recommended_products': recommended_products, 'recommended_type': recommended_type})
+    return render(request, 'index.html', {
+        'products': products,
+        'recommended_products': recommended_products,
+        'recommended_type': recommended_type
+    })
 
 @login_required
 def some_view(request):

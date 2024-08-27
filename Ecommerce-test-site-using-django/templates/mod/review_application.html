@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Review Application{% endblock %}
+{% if request.user.is_superuser %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Review Application</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Shop Name:</div>
+                <div class="col-sm-8">{{ seller.name }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">User:</div>
+                <div class="col-sm-8">{{ seller.user.username }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Citizenship Number:</div>
+                <div class="col-sm-8">{{ seller.cit_num }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Citizenship:</div>
+                <div class="col-sm-8">
+                    {% if seller.citizenship %}
+                        <img src="{{ seller.citizenship.url }}" class="img-thumbnail" alt="Citizenship">
+                    {% else %}
+                        Not Provided
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">PAN Number:</div>
+                <div class="col-sm-8">{{ seller.pan_number }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">PAN Card:</div>
+                <div class="col-sm-8">
+                    {% if seller.pan_pic %}
+                        <img src="{{ seller.pan_pic.url }}" class="img-thumbnail" alt="PAN Card">
+                    {% else %}
+                        Not Provided
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Owner's Picture:</div>
+                <div class="col-sm-8">
+                    {% if seller.owner_pic %}
+                        <img src="{{ seller.owner_pic.url }}" class="img-thumbnail" alt="Owner's Picture">
+                    {% else %}
+                        Not Provided
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Registration Certificate:</div>
+                <div class="col-sm-8">
+                    {% if seller.registration_certificate %}
+                        <img src="{{ seller.registration_certificate.url }}" class="img-thumbnail" alt="Registration Certificate">
+                    {% else %}
+                        Not Provided
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Facebook:</div>
+                <div class="col-sm-8"><a href="{{ seller.facebook }}" target="_blank">{{ seller.facebook }}</a></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Instagram:</div>
+                <div class="col-sm-8"><a href="{{ seller.instagram }}" target="_blank">{{ seller.instagram }}</a></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">YouTube:</div>
+                <div class="col-sm-8"><a href="{{ seller.youtube }}" target="_blank">{{ seller.youtube }}</a></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 font-weight-bold">Extra URL:</div>
+                <div class="col-sm-8"><a href="{{ seller.extra }}" target="_blank">{{ seller.extra }}</a></div>
+            </div>
+            
+            <form method="post" action="{% url 'review_application' seller.id %}">
+                {% csrf_token %}
+                <button type="submit" name="accept" class="btn btn-success">Accept</button>
+            </form>
+
+            <form method="post" action="{% url 'reject_application' seller.id %}" class="mt-3">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reason">Rejection Reason:</label>
+                    <textarea name="reason" id="reason" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" name="reject" class="btn btn-danger">Reject</button>
+            </form>
+
+            <div class="mt-3">
+                <a href="{% url 'manage_applicants' %}" class="btn btn-secondary">Back to Applicants</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% endif %}

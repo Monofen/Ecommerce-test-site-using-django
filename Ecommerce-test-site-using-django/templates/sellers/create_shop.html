@@ -1,10 +1,85 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Create Your Shop</h2>
-    <form method="post" enctype="multipart/form-data">
+    <h2 class="mb-4">Create Your Shop</h2>
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="row">
+            <!-- Name -->
+            <div class="col-md-6 mb-3">
+                <label for="id_name" class="form-label">Shop Name</label>
+                {{ form.name|as_crispy_field }}
+            </div>
+            <!-- Khalti API Code -->
+            <div class="col-md-6 mb-3">
+                <label for="id_khalti_api_code" class="form-label">Khalti API Code</label>
+                {{ form.khalti_api_code|as_crispy_field }}
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Citizenship -->
+            <div class="col-md-6 mb-3">
+                <label for="id_citizenship" class="form-label">Citizenship</label>
+                {{ form.citizenship|as_crispy_field }}
+            </div>
+            <!-- Citizenship Number -->
+            <div class="col-md-6 mb-3">
+                <label for="id_cit_num" class="form-label">Citizenship Number</label>
+                {{ form.cit_num|as_crispy_field }}
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Owner Picture -->
+            <div class="col-md-6 mb-3">
+                <label for="id_owner_pic" class="form-label">Owner's Picture</label>
+                {{ form.owner_pic|as_crispy_field }}
+            </div>
+            <!-- Registration Certificate -->
+            <div class="col-md-6 mb-3">
+                <label for="id_registration_certificate" class="form-label">Registration Certificate</label>
+                {{ form.registration_certificate|as_crispy_field }}
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- PAN Number -->
+            <div class="col-md-6 mb-3">
+                <label for="id_pan_number" class="form-label">PAN Number</label>
+                {{ form.pan_number|as_crispy_field }}
+            </div>
+            <!-- PAN Picture -->
+            <div class="col-md-6 mb-3">
+                <label for="id_pan_pic" class="form-label">PAN Picture</label>
+                {{ form.pan_pic|as_crispy_field }}
+            </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="id_facebook" class="form-label">Facebook</label>
+                {{ form.facebook|as_crispy_field }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="id_instagram" class="form-label">Instagram</label>
+                {{ form.instagram|as_crispy_field }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="id_youtube" class="form-label">YouTube</label>
+                {{ form.youtube|as_crispy_field }}
+            </div>
+        </div>
+
+        <!-- Extra Information -->
+        <div class="mb-3">
+            <label for="id_extra" class="form-label">Additional Information</label>
+            {{ form.extra|as_crispy_field }}
+        </div>
+
+        <!-- Submit Button -->
         <button type="submit" class="btn btn-primary">Create Shop</button>
     </form>
 </div>

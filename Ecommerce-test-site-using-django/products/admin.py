@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers
+from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers, Sale
 
-
+@admin.register(Sale)
+class categoriesAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(Category)
 class CategoriesAdmin(admin.ModelAdmin):

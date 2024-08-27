@@ -2,6 +2,7 @@ from django.db import models
 import datetime
 from django.contrib.auth.models import User
 from sellers.models import Sellers
+from django.utils import timezone
 
 class Category(models.Model):
     search_field = ('name',)
@@ -84,3 +85,22 @@ class Rating(models.Model):
 
     def __str__(self):
         return f'Rating by {self.user.username} on {self.product.name}'
+    
+class Sale(models.Model):
+    SALE_TYPES = [
+        ('site-wide', 'Site-wide'),
+        ('category', 'Category'),
+    ]
+    
+    sale_type = models.CharField(max_length=20, choices=SALE_TYPES)
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.CASCADE)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.sale_type} Sale - {self.percentage}%"
+
+    def is_active(self):
+        now = timezone.now()
+        return self.start_date <= now <= self.end_date

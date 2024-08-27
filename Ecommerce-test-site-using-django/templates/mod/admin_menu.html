@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-
+{% if request.user.is_superuser %}
 {% block title %}Admin Menu{% endblock %}
 
 {% block content %}
 <h1>Admin Menu</h1>
 <ul>
-    <li><a href="#">Dashboard</a></li>
     <li><a href="{% url 'manage_users' %}">Manage Users</a></li>
-    <li><a href="#">Manage Products</a></li>
-    <li><a href="#">Manage Orders</a></li>
-    <li><a href="#">Manage Categories</a></li>
+    <li><a href="{% url 'manage_applicants' %}">Applicants</a></li>
+    <li><a href="{% url 'create_sale' %}">Create Sale</a></li>
+    <li><a href="{% url 'delete_sale' %}">Delete Sale</a></li>
 </ul>
 {% endblock %}
+{% endif %}

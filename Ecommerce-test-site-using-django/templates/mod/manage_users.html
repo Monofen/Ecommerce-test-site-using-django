@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% if request.user.is_superuser %}
 {% block content %}
 <div class="container mt-4">
     <h1>Manage Users</h1>
@@ -98,3 +98,4 @@
     });
 </script>
 {% endblock %}
+{% endif %}

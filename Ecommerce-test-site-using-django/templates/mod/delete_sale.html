@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% if request.user.is_superuser %}
+{% block title %}Delete Sale{% endblock %}
+
+{% block content %}
+<h1>Delete Sale</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="sale_id">Select Sale:</label>
+    <select id="sale_id" name="sale_id">
+        {% for sale in sales %}
+        <option value="{{ sale.id }}">{{ sale }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <button type="submit">Delete Sale</button>
+</form>
+{% endblock %}
+{% endif %}

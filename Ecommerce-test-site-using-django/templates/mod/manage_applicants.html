@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% if request.user.is_superuser %}
+{% block title %}Manage Applicants{% endblock %}
+
+{% block content %}
+<h1>Manage Applicants</h1>
+
+{% if applicants %}
+    <ul>
+        {% for applicant in applicants %}
+            <li>
+                {{ applicant.name }} - <a href="{% url 'review_application' applicant.id %}">Review</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No new applications at the moment.</p>
+{% endif %}
+{% endblock %}
+{% endif %}

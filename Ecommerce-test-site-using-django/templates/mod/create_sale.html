@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% if request.user.is_superuser %}
+{% block title %}Create Sale{% endblock %}
+
+{% block content %}
+<h1>Create Sale</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="sale_type">Sale Type:</label>
+    <select id="sale_type" name="sale_type">
+        <option value="sitewide">Site-wide</option>
+        <option value="category">Category</option>
+    </select>
+    <br>
+    <label for="percentage">Percentage:</label>
+    <input type="number" id="percentage" name="percentage" step="0.01" required>
+    <br>
+    <label for="category">Category:</label>
+    <select id="category" name="category">
+        <option value="">None</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="start_date">Start Date:</label>
+    <input type="datetime-local" id="start_date" name="start_date" required>
+    <br>
+    <label for="end_date">End Date:</label>
+    <input type="datetime-local" id="end_date" name="end_date">
+    <br>
+    <button type="submit">Create Sale</button>
+</form>
+{% endblock %}
+{% endif %}

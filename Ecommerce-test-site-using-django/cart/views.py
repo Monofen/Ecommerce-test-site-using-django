@@ -20,6 +20,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.translation import gettext as _
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import SetPasswordForm
+from products.models import Coupon
 
 @login_required
 def update_photo(request):
@@ -59,7 +60,7 @@ def cart_summary(request):
     if request.user.is_authenticated:
         cart_items = CartItem.objects.filter(user=request.user)
         
-        total_cart_price = sum(item.quantity * (item.product.sale_price if item.product.on_sale else item.product.price) for item in cart_items)
+        total_cart_price = sum(item.item_total for item in cart_items)
         
         context = {
             'cart_items': cart_items,
@@ -69,6 +70,23 @@ def cart_summary(request):
         return render(request, 'cart/cart_summary.html', context)
     else:
         return redirect('login')
+
+@login_required
+def apply_coupon(request):
+    if request.method == 'POST':
+        coupon_code = request.POST.get('coupon_code')
+        coupon = Coupon.objects.filter(code=coupon_code, active=True).first()
+        
+        if coupon and coupon.is_active():
+            cart_items = CartItem.objects.filter(user=request.user)
+            for item in cart_items:
+                item.coupon = coupon
+                item.save()
+            messages.success(request, 'Coupon applied successfully!')
+        else:
+            messages.error(request, 'Invalid or expired coupon.')
+    
+    return redirect('cart:cart_summary')
 
 @login_required
 def update_quantity(request, item_id):

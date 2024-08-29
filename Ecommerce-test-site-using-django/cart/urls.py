@@ -23,4 +23,5 @@ urlpatterns = [
     path('send-change-password-email/', views.send_change_password_email, name='send_change_password_email'),
     path('reset/<uidb64>/<token>/confirm/', views.change_password_confirm, name='change_password_confirm'),
     path('reset/<uidb64>/<token>/change/', views.password_change_form, name='password_change_form'),
+    path('apply_coupon/', views.apply_coupon, name='apply_coupon'),
 ]

@@ -1,0 +1,23 @@
+<!-- mod/add_coupon.html -->
+{% extends "base.html" %}
+{% block title %}Add Coupon{% endblock %}
+
+{% block content %}
+<h1>Add Coupon</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="code">Coupon Code:</label>
+    <input type="text" id="code" name="code" required>
+    
+    <label for="discount_percentage">Discount Percentage:</label>
+    <input type="number" id="discount_percentage" name="discount_percentage" step="0.01" required>
+    
+    <label for="start_date">Start Date:</label>
+    <input type="datetime-local" id="start_date" name="start_date" required>
+    
+    <label for="end_date">End Date:</label>
+    <input type="datetime-local" id="end_date" name="end_date" required>
+    
+    <button type="submit">Add Coupon</button>
+</form>
+{% endblock %}

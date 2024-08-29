@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from authentication.models import UserProfile
-from products.models import Category, Product, Sale
+from products.models import Category, Product, Sale, Coupon
 from sellers.models import Sellers
 from django.db.models import Q
 from django.core.mail import send_mail
@@ -164,3 +164,35 @@ def delete_sale(request):
 
     sales = Sale.objects.all()
     return render(request, 'mod/delete_sale.html', {'sales': sales})
+
+@superuser_required
+def add_coupon(request):
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        discount_percentage = request.POST.get('discount_percentage')
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+
+        start_date = timezone.make_aware(datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M'), timezone.get_current_timezone())
+        end_date = timezone.make_aware(datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M'), timezone.get_current_timezone())
+
+        Coupon.objects.create(
+            code=code,
+            discount_percentage=discount_percentage,
+            start_date=start_date,
+            end_date=end_date
+        )
+        return redirect('admin_menu')
+
+    return render(request, 'mod/add_coupon.html')
+
+@superuser_required
+def remove_coupon(request):
+    if request.method == 'POST':
+        coupon_id = request.POST.get('coupon_id')
+        coupon = get_object_or_404(Coupon, id=coupon_id)
+        coupon.delete()
+        return redirect('admin_menu')
+
+    coupons = Coupon.objects.all()
+    return render(request, 'mod/remove_coupon.html', {'coupons': coupons})

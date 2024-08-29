@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers, Sale
+from .models import Category, Product, ProductImage, ElectronicProduct, Comment, Rating, Sellers, Sale, Coupon
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_percentage', 'start_date', 'end_date', 'active')
+    list_filter = ('active', 'start_date', 'end_date')
+    search_fields = ('code',)
+    date_hierarchy = 'start_date'
+    ordering = ('-start_date',)
 
 @admin.register(Sale)
 class categoriesAdmin(admin.ModelAdmin):

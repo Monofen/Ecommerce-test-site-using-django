@@ -10,4 +10,6 @@ urlpatterns = [
     path('reject_application/<int:seller_id>/', views.reject_application, name='reject_application'),
     path('create_sale/', views.create_sale, name='create_sale'),
     path('delete_sale/', views.delete_sale, name='delete_sale'),
+    path('add-coupon/', views.add_coupon, name='add_coupon'),
+    path('remove-coupon/', views.remove_coupon, name='remove_coupon'),
 ]

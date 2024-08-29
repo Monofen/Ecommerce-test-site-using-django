@@ -1,0 +1,17 @@
+<!-- mod/remove_coupon.html -->
+{% extends "base.html" %}
+{% block title %}Remove Coupon{% endblock %}
+
+{% block content %}
+<h1>Remove Coupon</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="coupon">Select Coupon to Remove:</label>
+    <select id="coupon" name="coupon_id">
+        {% for coupon in coupons %}
+            <option value="{{ coupon.id }}">{{ coupon.code }} - {{ coupon.discount_percentage }}%</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Remove Coupon</button>
+</form>
+{% endblock %}

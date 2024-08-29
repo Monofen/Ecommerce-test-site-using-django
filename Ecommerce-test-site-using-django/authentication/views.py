@@ -1,3 +1,4 @@
+from anyio import current_time
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -20,13 +21,14 @@ from cart.models import Purchase
 import random
 from django.utils import timezone
 from products.models import Product, Sale, Category
-
+from django.db.models import Q
+    
 def home(request):
     products = Product.objects.all()
     recommended_products = []
     recommended_type = None
 
-    # Fetch active sales
+   # Fetch active sales
     current_time = timezone.now()
     site_wide_sales = Sale.objects.filter(start_date__lte=current_time, end_date__gte=current_time, sale_type='site-wide')
     category_sales = Sale.objects.filter(start_date__lte=current_time, end_date__gte=current_time, sale_type='category')
@@ -38,14 +40,17 @@ def home(request):
         if site_wide_sale:
             product.sale_price = product.price * (1 - site_wide_sale.percentage / 100)
             product.on_sale = True
+            product.save()
         else:
             category_sale = category_sales.filter(category=product.category).first()
             if category_sale:
                 product.sale_price = product.price * (1 - category_sale.percentage / 100)
                 product.on_sale = True
+                product.save()
             else:
                 product.sale_price = product.price
                 product.on_sale = False
+                product.save()  
 
     # Fetch recommended products
     if request.user.is_authenticated:
